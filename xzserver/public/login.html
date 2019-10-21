@@ -1,0 +1,100 @@
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="Generator" content="EditPlus?">
+  <meta name="Author" content="">
+  <meta name="Keywords" content="">
+  <meta name="Description" content="">
+  <title>登录</title>
+  <link rel="stylesheet" href="css/normalize_zh.css">
+  <link rel="stylesheet" href="css/login.css">
+  <script src="js/vue.js"></script>
+  <style>
+  .vali_fail{
+      width: 80px;
+      height: 10px;
+      margin-top:15px;
+      margin-left: 15px;
+      border:1px solid red;
+      border-radius: 5px;
+      background:pink;
+      color:red;
+      padding:2px;
+      font-size: 10px;
+    }
+    .vali_success{
+      width: 80px;
+      height: 10px;
+      margin:15px;
+      border:1px solid green;
+      border-radius: 5px;
+      background:lightgreen;
+      color:green;
+      padding:2px;
+      font-size: 10px;
+    }
+  </style>
+ </head>
+ <body>
+  <section >
+	<img src="img/logo2.png" alt="" width="130.81px" style="margin-top:100px">
+	<div id="app">
+		<div>
+		  <fieldset><input v-model="phone" type="text"placeholder="手机号"class="wen1"><button class="b1">获取验证码</button></fieldset><span :class="spanClass">{{spanMsg}}</span>
+		</div>
+		<div>
+		  <fieldset><input type="text" placeholder="验证码" class="wen2"></fieldset>
+		</div>
+		<p>新用户登录即自动注册，并表示已同意<a href="">《用户服务协议》</a></p>
+		<br><br>
+		<a href="shops.html"><button class="b2">登录</button></a>
+	</div>
+  <script>
+  var vm=new Vue({
+  el:"#app",
+  data:{
+    //要想在vue中验证格式，必须先用双向绑定接住input中的内容！
+    phone:"",
+    //要控制span的样式，就要为span定义对象，控制启用或不启用哪个class
+    spanClass:{
+      vali_success:false,
+      vali_fail:false
+    },
+    //要控制span的内容，就要定义专门的变量保存span的内容
+    spanMsg:""
+  },
+  //要想边修改，边执行验证，只能用watch
+  watch:{
+    //监控哪个变量，函数名就要和变量名一致！
+    phone(){
+      var reg=/^1[3-9]\d{9}$/;
+      //如果验证通过！
+      if(reg.test(this.phone)==true){
+        //通过修改spanMsg变量的值，自动修改页面中span内容
+        this.spanMsg="√ 手机号可用";
+        //通过修改spanClass中类名后的true或false，决定这次用哪个class，不用哪个class！
+        this.spanClass={
+          vali_fail:false,//不启用验证失败的class
+          vali_success:true//启用验证成功的class
+        }
+      }else{//否则，验证不通过时
+        this.spanMsg="X 手机号格式不正确";
+        this.spanClass={
+          vali_fail:true,//启用验证失败的class
+          vali_success:false//不启用验证成功的class
+        }
+      }
+    }
+  }
+})
+  </script>
+  </section>
+  <footer>
+  <h4>所有方：上海拉扎斯信息科技有限公司
+  </h4>
+  <p>增值电信业务许可证：<a href="">沪B2-20150033|</a><a href="">沪ICP备09007032|</a><a href="">上海工商行政管理Copyright?2008-2007ele.me,All Rights Reserved.</a>
+  </p>
+  <img src="img/f1.jpg" alt="" width="86.54">
+  </footer>
+ </body>
+</html>
