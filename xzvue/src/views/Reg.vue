@@ -14,6 +14,7 @@
 	    </div>
         <br><br><button class="b2" id="jishu" @click="reg">提交注册</button>
       </div>
+      <p>已有账号？<a href="#/login">去登录</a></p>
     </section>
     <footer>
       <h4>所有方：上海拉扎斯信息科技有限公司</h4>
@@ -27,7 +28,7 @@
 export default{
         data(){
             return{
-                upwdholder:"请输入密码（3-12位）",
+                upwdholder:"请输入密码（3-12位字母或数字）",
                 uname:"",
                 upwd:"",
                 email:"",
@@ -36,6 +37,17 @@ export default{
             }
         },
         methods:{
+            isExist(){
+                var uname = this.uname;
+                var url = "http://127.0.0.1:3000/isEx";
+                var obj = {uname}
+                this.axios.get(url,{params:obj}).then(res=>{
+                    if(res.data.msg=='用户名不可用！'){
+                            alert("用户名不可用！请重试");
+                            this.uname = '';
+                        }
+                })
+            },
             reg(){
                 var u = this.uname;
                 var p = this.upwd;
@@ -43,7 +55,7 @@ export default{
                 var ph = this.phone;
                 var g = this.gender;
                 // console.log(u+"_"+p);
-                var reg = /^.{3,12}$/i;
+                var reg = /^[^\s]{3,12}$/i;
                 var reg2 = /^[a-z0-9]{3,12}$/i
                 var reg3 = /^\w[-\w.+]*@([A-Za-z0-9][-A-Za-z0-9]+\.)+[A-Za-z]{2,14}$/i;
                 var reg4 = /^0?(13|14|15|18|17)[0-9]{9}$/i;
@@ -85,6 +97,11 @@ export default{
                     },1000);
                 })
             }
+        },
+        watch:{	//监视函数，监视变量的变化，经常用于搜素帮助
+                uname(){
+                    this.isExist();
+                }
         }
     }
     
@@ -117,6 +134,9 @@ height:320px;
 .sex{display: flex;align-items: center;padding: 0 18px}
 .b2{width:300px;height:48px;background:#4CD96F;color:#ffffff;
 	font-size:16px;border:0;}
+section p{
+color:#999999;
+font-size:14px;}
 footer{
 	height:104px;
 	font-size:12px;

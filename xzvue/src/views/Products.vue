@@ -9,24 +9,33 @@
             <li><a href="">我的客服</a></li>
             <li><a href="">规则中心</a></li>
             <li><a href="">手机应用</a></li>
-            <li><a href="#/login" id="user">请登录</a></li>
+            <li id="user">
+              <a href="#/login">{{uname}}</a>
+              <ul>
+                <li>
+                  <a href="#/personal">个人中心</a>
+                </li>
+                <li @click="zhuXiao">
+                  <a href="#/login">注销登录</a>
+                </li>
+              </ul>
+            </li>
           </ul>
         </nav>
     </header>
     <div id="d0">
-      <div id="d01"><a href="">更多信息<img src="" alt=""/></a></div>—
-      <div id="d02"><a href="">购物车<img src="" alt=""/></a></div>—
+      <div id="d01"><a href=""><img src="../../public/img/更多.png" alt="更多信息" title="更多信息"/></a></div>—
+      <div id="d02"><a href="#/cart"><img src="../../public/img/购物车.png" alt="购物车" title="购物车"/></a></div>—
       <div id="d03">
-        <a href="">联系我们<img src="" alt=""/></a>
-        <a href="">二维码<img src="" alt=""/></a>
+        <a href="">联系我们<img src="../../public/img/二维码.png" alt="二维码" title="联系我们"/></a>
       </div>
     </div>
     <section>
       <div>
         <div>
           <span id="sp1">当前位置：
-            <a href="" class="a1">硅谷广场</a>
-            <a href="" class="a2">[切换地址]</a>
+            <a href="javascript:;" class="a1">硅谷广场</a>
+            <a href="javascript:;" class="a2">[切换地址]</a>
           </span>
         </div>
         <input type="text" placeholder="搜索商家,美食..." id="i1">
@@ -134,15 +143,37 @@ export default {
             list:[],
             pno:'',
             pageSize:'',
-            psTime:Math.random()*40+15
+            psTime:Math.random()*40+15,
+            uname:'请登录'
     }
   },
   created(){
         this.getMore();
     },
     methods:{
-        //加载更多  加载下一页数据
+        zhuXiao(){
+          var url = "http://127.0.0.1:3000/tuichu";
+          this.axios.get(url).then(res=>{
+              if(res.data.code == -1){
+                  this.$router.push("/Login");
+               }
+          })
+        },
+        //加载页面数据
         getMore(){
+            var url = "http://127.0.0.1:3000/user";
+            this.axios.get(url).then(res=>{
+              console.log(res);
+              if(res.data.code == -1){
+                  alert("请登录")      
+              }else{
+                // var uname = sessionStorage.getItem("name1");
+                var uname = res.data.uname;
+                console.log(uname);
+                console.log(this.uname);
+                this.uname=uname;
+              }
+            })
             // 1:修改当前页码+1
             this.pno++;
             // 2:发送请求get
@@ -192,12 +223,12 @@ export default {
 		}
     #d0 div{margin:70px 0}
 		#d0 a{color:#fff;font-size:12px}
-		#d01{width: 20%}
-		#d02{width:20% }
-		#d03{width: 50%}
+		#d01{width:65%}
+		#d02{width:65%}
+		#d03{width:65%}
 		header{width:100%;height:60px;background:#1e89e0;}
 		header nav{width:77.541%;margin:0 auto;}
-		header ul:before{content:url(../assets/logo_up.png);}
+		header>nav>ul:before{content:url(../assets/logo_up.png);}
 		header ul{
 			height:60px;
 			display:flex;
@@ -205,7 +236,28 @@ export default {
 			align-items:center;
 			}
 		header ul li{width:400px;}
-		header ul li a{text-decoration:none;color:#fff;}
+    header ul li a{text-decoration:none;color:#fff;}
+
+    #user{
+      position: relative;
+    }
+    #user ul{
+      width: 100px;
+      background-color: #1e89e0;
+      display: none;
+      position: absolute;
+      top: 20px;
+    }
+    #user ul>li{
+      padding: 2px;
+    }
+    /* #user ul>li>a{
+      color: #000;
+    } */
+    #user:hover ul{
+      display: block;
+    }
+
 		section>div:first-child{height:40.6px;font-size:12px;margin-top:10px;display:flex;justify-content:space-between;}
 		section>div:first-child>input{height:30px;width:300px;outline:none;} 
 		section>div:first-child>div{margin-top:5px;}

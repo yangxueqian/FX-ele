@@ -35,19 +35,37 @@ app.get("/login",(req,res)=>{
    if(err)throw err;
    // 判断用户登录成功
    if(result.length==0){
-   res.send({code:-1,msg:"用户名或密码有误"});
+    var sql2 = "SELECT uid,uname FROM ele_user";
+    sql2 +=" WHERE phone = ? AND upwd = md5(?)";
+     pool.query(sql2,[uname,upwd],(err,result)=>{
+      if(err)throw err;
+      if(result.length==0){
+      res.send({code:-1,msg:"用户名或密码有误"});
+      }else{
+        //登录成功
+        // 1:将登录成功凭据保存session
+        //如果登录成功，result=[{id:1}],取出result数组中登录成功的id序号作为登录成功的凭据保存到session中
+        req.session.uid = result[0].uid;
+        req.session.uname = result[0].uname;
+        console.log(req.session);
+        uname = req.session.uname;
+        //2.将成功消息发送脚手架
+        res.send({code:1,msg:"登录成功",uname:uname})
+        console.log(`用户${uname}已登录！`);
+      }
+    })
    }else{
-   //登录成功
+     //登录成功
      // 1:将登录成功凭据保存session
      //如果登录成功，result=[{id:1}],取出result数组中登录成功的id序号作为登录成功的凭据保存到session中
      req.session.uid = result[0].uid;
      req.session.uname = uname;
      console.log(req.session);
      //2.将成功消息发送脚手架
-   res.send({code:1,msg:"登录成功"})
+     res.send({code:1,msg:"登录成功",uname:uname})
+     console.log(`用户${uname}已登录！`);
    }
  })
- console.log("1个用户已登录！");
 });
 //功能2：商品的分页显示
 app.get("/products",(req,res)=>{
@@ -81,6 +99,7 @@ app.get("/reg",(req,res)=>{
   pool.query(sql0,una,(err,result)=>{
     if(err)throw err;
     if(result.length==0){
+      if(!una==""){
      var sql = `INSERT INTO ele_user VALUES("null",?,md5(?),?,?,"null","null",?)`;
       pool.query(sql,[una,upwd,email,phone,gender],(err,result)=>{
         if(err)throw err;
@@ -90,17 +109,56 @@ app.get("/reg",(req,res)=>{
         res.send({code:-1,msg:"注册失败，请检查网络！"});
         }
       })
-      console.log("1个用户已注册！");
-    }else{
-     res.send({code:-1,msg:"用户名不可用！"});
+      console.log("1个用户已注册！");}
     }
   })
 })
 //检查用户是否登录
 app.get("/user",(req,res)=>{
-  var uid=req.session.uid
+  var uid=req.session.uid;
+  console.log(req.session)
   if(!uid){
     res.send({code:-1,msg:"请先登录"});
     return;
+  }else{
+    var uname = req.session.uname;
+    console.log(uname);
+    res.send({code:1,msg:"登录成功",uname:uname});
   }
-});
+})
+//查询注册用户的uname是否存在
+app.get("/isEx",(req,res)=>{
+  var uname=req.query.uname;
+  console.log(uname)
+  var sql = 'SELECT uid FROM ele_user WHERE uname=?';
+  pool.query(sql,uname,(err,result)=>{
+    if(err)throw err;
+    if(!result.length==0){
+      res.send({code:-1,msg:"用户名不可用！"});
+    }
+  })
+})
+
+//查询当前登录用户购物车信息
+app.get("/cart",(req,res)=>{
+  var uid = req.session.uid;
+  var uname = req.session.uname;
+  console.log(uid)
+  console.log(uname)
+  if(!uid){
+    res.send({code:-1,msg:"请登录"});
+    return;
+  }
+  // var sql = "SELECT  id,lid,lname,price,count,img_url FROM ele_cart WHERE uid = ?";
+  // pool.query(sql,[uid],(err,result)=>{
+  //   if(err)throw err;
+  //   res.send({code:1,msg:"登录成功",yonghu:uname,data:result});
+  // })
+})
+
+//退出登录
+app.get("/tuichu",(req,res)=>{
+  req.session.uid=0;
+  console.log(req.session);
+  res.send({code:-1,msg:"请登录"});
+})

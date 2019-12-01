@@ -2,10 +2,10 @@
   <div>
     <section >
       <img src="img/login/logo2.png" alt="" width="130.81px" style="margin-top:100px">
-      <div>
+      <div id="yonghu">
         <fieldset><input type="text" :placeholder="unameholder" v-model="uname" class="wen1"><button class="b1">获取验证码</button></fieldset>
         <fieldset><input type="password" :placeholder="upwdholder" v-model="upwd" class="wen2"></fieldset>
-        <p>新用户登录即自动注册，并表示已同意<a href="">《用户服务协议》</a></p>
+        <p>新用户使用验证码登录即自动注册，并表示已同意<a href="javascript:;">《用户服务协议》</a>您也可以点击<a href="#/reg">去注册</a></p>
         <br><br><button class="b2" @click="login">登录</button>
       </div>
     </section>
@@ -21,13 +21,25 @@
 export default{
         data(){
             return{
-                unameholder:"请输入用户名",
+                unameholder:"请输入用户名或手机号",
                 upwdholder:"请输入密码",
                 uname:"",
                 upwd:""
             }
         },
+        created(){
+            this.getMore();
+        },
         methods:{
+            getMore(){
+                var uname = sessionStorage.getItem("uname");
+                var url = "http://127.0.0.1:3000/user";
+                this.axios.get(url).then(res=>{
+                if(res.data.code == 1){
+                    yonghu.innerHTML=`<h1 style="margin-top:100px;width:400px;color:#ee7700">尊敬的${uname},欢迎您！</h1>`;
+                }
+                })
+            },
             login(){
                 var u = this.uname;
                 var p = this.upwd;
@@ -51,6 +63,11 @@ export default{
                     if(res.data.code==-1){
                         alert("用户名和密码有误");
                     }else{
+                        console.log(res)
+                        var uname = res.data.uname;
+                        console.log(uname)
+                        sessionStorage.setItem("uname",uname);
+                        // yonghu.innerHTML=`<h1 style="color:#ee7700">尊敬的${uname},欢迎您！</h1>`;
                         this.$router.push("/Products")
                     }
                 })
